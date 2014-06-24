@@ -39,15 +39,14 @@ class oksdk
         $curl = curl_init('http://api.odnoklassniki.ru/oauth/token.do');
 
         curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, array(
+        curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query(array(
             'code' => $code,
             'redirect_uri' => urlencode($redirect_uri),
             'grant_type' => 'authorization_code',
             'client_id' => $this->appId,
             'client_secret' => $this->secret
-        ));
+        )));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-type: application/x-www-form-urlencoded'));
 
         $s = curl_exec($curl);
         curl_close($curl);
