@@ -8,7 +8,7 @@ class oksdk
     private $appId;
     private $publicKey;
     private $secret;
-    private $tokens;
+    private $tokens = array();
 
     public function __construct($appId, $publicKey, $secret)
     {
@@ -61,7 +61,8 @@ class oksdk
             throw new \Exception($response['error']);
         }
 
-        $this->tokens = $response;
+        $this->tokens['access_token'] = $response['access_token'];
+        $this->tokens['refresh_token'] = $response['refresh_token'];
     }
 
     public function getNewAccessToken($refreshToken)
@@ -85,6 +86,8 @@ class oksdk
         if (!$response || !isset($response['access_token'])) {
             throw new \Exception('Odnoklassniki API error');
         }
+
+        $this->tokens['access_token'] = $response['access_token'];
 
         return $response['access_token'];
     }
