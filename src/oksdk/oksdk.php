@@ -57,7 +57,7 @@ class oksdk
             throw new \Exception('Odnoklassniki API error');
         }
 
-        if ($response['error']) {
+        if (isset($response['error']) && $response['error']) {
             throw new \Exception($response['error']);
         }
 
