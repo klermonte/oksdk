@@ -41,7 +41,7 @@ class oksdk
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query(array(
             'code' => $code,
-            'redirect_uri' => urlencode($redirect_uri),
+            'redirect_uri' => $redirect_uri,
             'grant_type' => 'authorization_code',
             'client_id' => $this->appId,
             'client_secret' => $this->secret
@@ -55,6 +55,10 @@ class oksdk
 
         if (!$response) {
             throw new \Exception('Odnoklassniki API error');
+        }
+
+        if ($response['error']) {
+            throw new \Exception($response['error']);
         }
 
         $this->tokens = $response;
