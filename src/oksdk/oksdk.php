@@ -53,7 +53,7 @@ class oksdk
 
         $response = json_decode($s, true);
 
-        if (!($responseJSON = json_decode($response))) {
+        if (!$response) {
             throw new \Exception('Odnoklassniki API error');
         }
 
@@ -79,7 +79,7 @@ class oksdk
 
         $response = json_decode($s, true);
 
-        if (!($responseJSON = json_decode($response))) {
+        if (!$response) {
             throw new \Exception('Odnoklassniki API error');
         }
 
