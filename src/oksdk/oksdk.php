@@ -17,7 +17,7 @@ class oksdk
         $this->secret = $secret;
     }
 
-    public function getAuthUrl($redirectUri, $scope = null)
+    public function getAuthUrl($redirectUri, $scope = array())
     {
         $params = array(
             'client_id' => $this->appId,
@@ -26,7 +26,7 @@ class oksdk
         );
 
         if (!empty($scope)) {
-            $params['scope'] = $scope;
+            $params['scope'] = implode(',', $scope);
         }
 
         $url = 'http://www.odnoklassniki.ru/oauth/authorize';
