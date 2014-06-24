@@ -26,7 +26,7 @@ class oksdk
         );
 
         if (!empty($scope)) {
-            $params['scope'] = implode(',', $scope);
+            $params['scope'] = implode(';', $scope);
         }
 
         $url = 'http://www.odnoklassniki.ru/oauth/authorize';
