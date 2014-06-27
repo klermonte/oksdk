@@ -110,9 +110,8 @@ class oksdk
      *
      * @param string $refreshToken received refresh token
      * @throws \Exception on API or request error
-     * @return string new access token
      */
-    public function getNewAccessToken($refreshToken)
+    public function refreshAccessToken($refreshToken)
     {
         $curl = curl_init('http://api.odnoklassniki.ru/oauth/token.do');
 
@@ -135,8 +134,6 @@ class oksdk
         }
 
         $this->tokens['accessToken'] = $response['access_token'];
-
-        return $this->tokens['accessToken'];
     }
 
     /**
@@ -176,18 +173,21 @@ class oksdk
      * Call odnoklassniki API method
      *
      * @param string $method method to call
-     * @param string $accessToken received access token
      * @param array $params parameters for called method
      * @return mixed odnoklassniki response
      * @throws \Exception on API or request error
      */
-    public function api($method, $accessToken, $params = array())
+    public function api($method, $params = array())
     {
+        if (empty($this->tokens) || isset($this->tokens['accessToken'])) {
+            throw new \Exception('Access token not defined');
+        }
+
         $params['application_key'] = $this->publicKey;
         $params['method'] = $method;
         $params['format'] = 'json';
-        $params['sig'] = $this->sign($params, $accessToken);
-        $params['access_token'] = $accessToken;
+        $params['sig'] = $this->sign($params, $this->tokens['accessToken']);
+        $params['access_token'] = $this->tokens['accessToken'];
 
         $curl = curl_init('http://api.odnoklassniki.ru/fb.do?' . http_build_query($params));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
