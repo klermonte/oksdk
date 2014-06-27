@@ -5,11 +5,35 @@ namespace oksdk;
 
 class oksdk
 {
+    /**
+     * Application id
+     * @var string
+     */
     private $appId;
+
+    /**
+     * Public application key
+     * @var string
+     */
     private $publicKey;
+
+    /**
+     * Secret application key
+     * @var string
+     */
     private $secret;
+
+    /**
+     * Saved access and refresh tokens
+     * @var array
+     */
     private $tokens = array();
 
+    /**
+     * @param string $appId Your application id
+     * @param string $publicKey Your application public key
+     * @param string $secret Your application secret
+     */
     public function __construct($appId, $publicKey, $secret)
     {
         $this->appId = $appId;
@@ -17,7 +41,16 @@ class oksdk
         $this->secret = $secret;
     }
 
-    public function getAuthUrl($redirectUri, $scope = array())
+    /**
+     * Generates odnoklassniki authorization URL, that you use for
+     * redirect user
+     *
+     * @param string $redirectUri Your application id
+     * @param array $scope requested permissions, by default used
+     * only VALUABLE_ACCESS permission
+     * @return string generated url
+     */
+    public function getAuthUrl($redirectUri, $scope = array('VALUABLE_ACCESS'))
     {
         $params = array(
             'client_id' => $this->appId,
@@ -34,14 +67,21 @@ class oksdk
         return $url . '?' . http_build_query($params);
     }
 
-    private function getTokens($code, $redirect_uri)
+    /**
+     * Send request to odnoklassniki API, and get access and refresh tokens
+     *
+     * @param string $code auth code from GET
+     * @param string $redirectUri the same $redirectUri, that was sended in getAuthUrl()
+     * @throws \Exception on API or request error
+     */
+    private function getTokens($code, $redirectUri)
     {
         $curl = curl_init('http://api.odnoklassniki.ru/oauth/token.do');
 
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query(array(
             'code' => $code,
-            'redirect_uri' => $redirect_uri,
+            'redirect_uri' => $redirectUri,
             'grant_type' => 'authorization_code',
             'client_id' => $this->appId,
             'client_secret' => $this->secret
@@ -61,10 +101,17 @@ class oksdk
             throw new \Exception($response['error']);
         }
 
-        $this->tokens['access_token'] = $response['access_token'];
-        $this->tokens['refresh_token'] = $response['refresh_token'];
+        $this->tokens['accessToken'] = $response['access_token'];
+        $this->tokens['refreshToken'] = $response['refresh_token'];
     }
 
+    /**
+     * Update access token by refresh token
+     *
+     * @param string $refreshToken received refresh token
+     * @throws \Exception on API or request error
+     * @return string new access token
+     */
     public function getNewAccessToken($refreshToken)
     {
         $curl = curl_init('http://api.odnoklassniki.ru/oauth/token.do');
@@ -87,30 +134,53 @@ class oksdk
             throw new \Exception('Odnoklassniki API error');
         }
 
-        $this->tokens['access_token'] = $response['access_token'];
+        $this->tokens['accessToken'] = $response['access_token'];
 
-        return $response['access_token'];
+        return $response['accessToken'];
     }
 
-    public function getAccessToken($code, $redirect_uri)
+    /**
+     * Send request to odnoklassniki API, and get access token
+     *
+     * @param string $code auth code from GET
+     * @param string $redirectUri the same $redirectUri, that was sended in getAuthUrl()
+     * @return string access token
+     */
+    public function getAccessToken($code, $redirectUri)
     {
         if (!$this->tokens) {
-            $this->getTokens($code, $redirect_uri);
+            $this->getTokens($code, $redirectUri);
         }
 
-        return $this->tokens['access_token'];
+        return $this->tokens['accessToken'];
 
     }
 
-    public function getRefreshToken($code, $redirect_uri)
+    /**
+     * Send request to odnoklassniki API, and get refresh token
+     *
+     * @param string $code auth code from GET
+     * @param string $redirectUri the same $redirectUri, that was sended in getAuthUrl()
+     * @return string refresh token
+     */
+    public function getRefreshToken($code, $redirectUri)
     {
         if (!$this->tokens) {
-            $this->getTokens($code, $redirect_uri);
+            $this->getTokens($code, $redirectUri);
         }
 
-        return $this->tokens['refresh_token'];
+        return $this->tokens['refreshToken'];
     }
 
+    /**
+     * Call odnoklassniki API method
+     *
+     * @param string $method method to call
+     * @param string $accessToken received access token
+     * @param array $params parameters for called method
+     * @return mixed odnoklassniki response
+     * @throws \Exception on API or request error
+     */
     public function api($method, $accessToken, $params = array())
     {
         $params['application_key'] = $this->publicKey;
@@ -133,7 +203,14 @@ class oksdk
         return $response;
     }
 
-    public function sign($params, $accessToken)
+    /**
+     * Generate request sign by request parameters
+     *
+     * @param array $params parameters for called method
+     * @param array $accessToken received access token
+     * @return string generated sign
+     */
+    private function sign($params, $accessToken)
     {
         $sign = '';
         ksort($params);
