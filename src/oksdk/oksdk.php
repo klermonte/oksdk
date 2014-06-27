@@ -190,7 +190,7 @@ class oksdk
      */
     public function api($method, $params = array())
     {
-        if (empty($this->tokens) || isset($this->tokens['accessToken'])) {
+        if (empty($this->tokens) || !isset($this->tokens['accessToken'])) {
             throw new \Exception('Access token not defined');
         }
 
