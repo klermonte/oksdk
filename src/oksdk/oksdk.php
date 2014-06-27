@@ -190,6 +190,7 @@ class oksdk
         $params['access_token'] = $accessToken;
 
         $curl = curl_init('http://api.odnoklassniki.ru/fb.do?' . http_build_query($params));
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $response = curl_exec($curl);
 
         if (!$response = json_decode($response)) {
