@@ -204,12 +204,12 @@ class oksdk
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $response = curl_exec($curl);
 
-        if (!$response = json_decode($response)) {
+        if (!$response = json_decode($response, true)) {
             throw new \Exception('Odnoklassniki API error');
         }
 
-        if (!empty($response->error_code) && !empty($response->error_msg)) {
-            throw new \Exception($response->error_msg, $response->error_code);
+        if (!empty($response['error_code']) && !empty($response['error_msg'])) {
+            throw new \Exception($response['error_msg'], $response['error_code']);
         }
 
         return $response;
