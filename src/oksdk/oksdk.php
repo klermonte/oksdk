@@ -30,15 +30,26 @@ class oksdk
     private $tokens = array();
 
     /**
-     * @param string $appId Your application id
+     * @param mixed $appId Your application id, or array of parameters:
+     * [
+     *     'appId' => Your application id,
+     *     'publicKey' => Your application public key,
+     *     'appSecret' => Your application secret
+     * ]
      * @param string $publicKey Your application public key
      * @param string $secret Your application secret
      */
-    public function __construct($appId, $publicKey, $secret)
+    public function __construct($appId, $publicKey = null, $secret = null)
     {
-        $this->appId = $appId;
-        $this->publicKey = $publicKey;
-        $this->secret = $secret;
+        if (is_array($appId)) {
+            $this->appId = $appId['appId'];
+            $this->appId = $appId['publicKey'];
+            $this->appId = $appId['appSecret'];
+        } else {
+            $this->appId = $appId;
+            $this->publicKey = $publicKey;
+            $this->secret = $secret;
+        }
     }
 
     /**
