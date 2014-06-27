@@ -43,8 +43,8 @@ class oksdk
     {
         if (is_array($appId)) {
             $this->appId = $appId['appId'];
-            $this->appId = $appId['publicKey'];
-            $this->appId = $appId['appSecret'];
+            $this->publicKey = $appId['publicKey'];
+            $this->secret = $appId['appSecret'];
         } else {
             $this->appId = $appId;
             $this->publicKey = $publicKey;
