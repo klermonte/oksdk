@@ -136,7 +136,7 @@ class oksdk
 
         $this->tokens['accessToken'] = $response['access_token'];
 
-        return $response['accessToken'];
+        return $this->tokens['accessToken'];
     }
 
     /**
