@@ -202,9 +202,10 @@ class oksdk
 
         $curl = curl_init('http://api.odnoklassniki.ru/fb.do?' . http_build_query($params));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        $response = curl_exec($curl);
+        $rawResponse = curl_exec($curl);
+        $response = json_decode($rawResponse, true);
 
-        if (!$response = json_decode($response, true)) {
+        if ($response === null) {
             throw new \Exception('Odnoklassniki API error');
         }
 
